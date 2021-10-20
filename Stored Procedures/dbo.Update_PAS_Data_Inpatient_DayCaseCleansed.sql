@@ -75,6 +75,10 @@ Set DiagnosisAll = concat(coalesce(Diagnosis1 +', ', ''),  coalesce(Diagnosis2 +
 from [Foundation].[dbo].[PAS_Data_Inpatient]
 
 
+------------------------------------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------------------------------------
+
+
 
 
 --STREAM DATA -----------------------------------------------------------------------------------------------------------------------------
@@ -270,6 +274,58 @@ from
 foundation.dbo.PAS_Data_Inpatient i
 left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.SystemLinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[AdmissionExtrasHistory] ha on (ha.admissionid = i.SystemLinkID and ha.patientid = i.LocalPatientIdentifier and ha.area = i.area)
+
+
+
+
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+--update missing discharge data in admissions and episodes that areout of the refresh cycle, this is for data completeness
+
+ Update I1
+
+SET
+
+		I1.DateDischarged = i2.DateDischarged,
+		i1.DischargeMethod = i2.DischargeMethod,
+		i1.DischargeDestination = i2.DischargeDestination,
+		i1.PatientClassification = i2.PatientClassification
+
+FROM
+		Foundation.dbo.PAS_Data_Inpatient i1
+		LEFT JOIN Foundation.dbo.PAS_Data_Inpatient i2	ON i1.ProviderSpellNumber = i2.ProviderSpellNumber
+														AND i2.LastEpisodeInSpellIndicator = '1'
+														AND i1.DateAdmitted = i2.DateAdmitted
+
+WHERE
+		i1.DateDischarged IS NULL
+		AND	i2.DateDischarged IS NOT NULL
+        AND i1.ProviderSpellNumber = i2.ProviderSpellNumber
+		AND i1.LocalPatientIdentifier = i2.LocalPatientIdentifier
+		AND i1.Area = i2.area
+		AND i1.Source = i2.Source
+		AND i2.DateDischarged >= i1.DateAdmitted
+
+
+
+
+
+
+
+
+
+
+
 
 
 
