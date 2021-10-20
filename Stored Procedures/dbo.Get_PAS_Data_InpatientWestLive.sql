@@ -1,0 +1,21 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+
+CREATE PROCEDURE [dbo].[Get_PAS_Data_InpatientWestLive]
+	
+AS
+BEGIN
+	
+SET NOCOUNT ON;
+
+
+EXEC [7A1AUSRVIPMSQL].[iPMProduction].[dbo].[Get_PAS_Data_InpatientWestLive]
+
+
+	
+
+END
+
+GO

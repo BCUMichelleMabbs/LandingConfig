@@ -1,0 +1,8 @@
+CREATE TABLE [dbo].[ProcType]
+(
+[Id] [int] NOT NULL IDENTITY(1, 1),
+[Name] [varchar] (50) COLLATE Latin1_General_CI_AS NOT NULL
+) ON [PRIMARY]
+GO
+ALTER TABLE [dbo].[ProcType] ADD CONSTRAINT [PK_ProcType] PRIMARY KEY CLUSTERED ([Id]) ON [PRIMARY]
+GO

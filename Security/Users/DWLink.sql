@@ -1,0 +1,2 @@
+CREATE USER [DWLink] FOR LOGIN [DWLink]
+GO

@@ -1,0 +1,16 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE PROCEDURE [dbo].[Get_WAST_Ref_CallReceivedMethod]
+AS
+BEGIN
+SET NOCOUNT ON;
+
+SELECT  DISTINCT [CallReceivedMethod]
+FROM [SSIS_LOADING].[WAST].[dbo].[WAST_Data_Historic]
+WHERE CallReceivedMethod IS NOT NULL
+ORDER BY CallReceivedMethod
+
+END
+GO

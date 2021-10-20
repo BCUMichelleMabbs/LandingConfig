@@ -1,0 +1,20 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE PROCEDURE [dbo].[Get_Eform_Ref_ReviewType]
+	
+AS
+BEGIN
+	
+SELECT DISTINCT 
+	ReviewType
+
+FROM 
+	[SSIS_Loading].[EFORMS].[dbo].[X_WA_QuestionReturns]
+
+WHERE
+	ReviewType IS NOT NULL
+
+End
+GO

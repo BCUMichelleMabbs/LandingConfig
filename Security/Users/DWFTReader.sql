@@ -1,0 +1,2 @@
+CREATE USER [DWFTReader] FOR LOGIN [DWFTReader]
+GO

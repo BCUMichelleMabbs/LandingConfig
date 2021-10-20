@@ -1,0 +1,16 @@
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_NULLS ON
+GO
+CREATE PROCEDURE [dbo].[Get_WAST_Ref_LateTurnaroundReason]
+AS
+BEGIN
+SET NOCOUNT ON;
+
+SELECT  DISTINCT LateTurnaroundReason
+FROM [SSIS_LOADING].[WAST].[dbo].[WAST_Data_Historic]
+WHERE LateTurnaroundReason IS NOT NULL
+
+
+END
+GO
