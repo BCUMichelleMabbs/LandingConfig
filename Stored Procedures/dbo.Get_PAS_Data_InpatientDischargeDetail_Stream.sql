@@ -27,7 +27,7 @@ BEGIN
 
 SET NOCOUNT ON;
 
---declare @DateEpisodeEnded as Date = '01 November 2020'
+--declare @DateRequested as Date = '01 November 2020'
 
 DECLARE @DateRequested AS DATE = (SELECT ISNULL(MAX(DateRequestedActivity),'1 January 2010') FROM [Foundation].[dbo].[PAS_Data_InpatientDischargeDetail]) 
 DECLARE @DateRequestedString AS VARCHAR(30) = DATENAME(DAY,@DateRequested) + ' ' + DATENAME(MONTH,@DateRequested) + ' ' + DATENAME(YEAR,@DateRequested)
@@ -46,8 +46,13 @@ Select
 		CAST(DateTimeRequested AS DATE) AS DateRequestedActivity,
 		CAST(DateTimeRequested AS TIME) AS TimeRequestedActivity,
 		cast(DateTimeCompleted AS Date) AS DateCompletedActivity,
-		CAST(DateTimeCompleted AS TIME) AS TimeCompletedActivity
-		
+		CAST(DateTimeCompleted AS TIME) AS TimeCompletedActivity,
+		CASE 
+			WHEN area = 'Central' THEN 'WPAS'
+			WHEN area = 'East' THEN 'Myrddin'
+			WHEN area = 'West' THEN 'Pims'
+	ELSE NULL
+	END AS Source
 
 from [7A1AUSRVSQL0003].[WardBoards].[dbo].[PatientActivity]
 WHERE CAST(DateTimeRequested AS DATE) > ''+@DateRequestedString+''

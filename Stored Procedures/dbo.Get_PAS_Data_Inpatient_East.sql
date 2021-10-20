@@ -88,6 +88,7 @@ EXEC( 'SELECT DISTINCT
 		nullif(rtrim(h.thecode), '''') as HealthcareResourceGroup,
 		Case
 				when e.episodeno is not null then cast(e.episodeno as int)
+				when e.episodeno is null and t.trt_Type  in (''AD'', ''AC'', ''AL'') then ''1''
 				else ''0''
 				end as EpisodeNumber,
 		

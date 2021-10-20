@@ -29,3 +29,5 @@ END
 GO
 DISABLE TRIGGER [dbo].[DatasetErrors] ON [dbo].[AuditItem_Archive]
 GO
+DISABLE TRIGGER [dbo].[DatasetErrors] ON [dbo].[AuditItem_Archive]
+GO

@@ -76,8 +76,11 @@ EXEC( '
 		''East'' AS Area,
 		''Myrddin'' AS Source,
 		''IPE'' AS Dataset,
-		T.actnotekey||''|East|''||  		Case
-		when e.episodeno is not null then cast(e.episodeno as int)
+		T.actnotekey||''|East|''||  		
+		T.actnotekey||''|Central|''||  		
+					Case
+						when e.episodeno is not null then cast(e.episodeno as int)
+						when e.episodeno is null and t.trt_Type  in (''AD'', ''AC'', ''AL'') then ''1''
 				else ''0''
 				end ||''|Myrddin|IPE'' AS PatientLinkId,
 		NULLIF(P.CERTIFIED,'''') AS NHSNumberStatus,
@@ -199,8 +202,11 @@ SELECT DISTINCT
 		''East'' AS Area,
 		''Myrddin'' AS Source,
 		''IPA'' AS Dataset,
-		T.actnotekey||''|East|''||  		Case
-		when e.episodeno is not null then cast(e.episodeno as int)
+		T.actnotekey||''|East|''||  		
+		T.actnotekey||''|Central|''||  		
+					Case
+						when e.episodeno is not null then cast(e.episodeno as int)
+						when e.episodeno is null and t.trt_Type  in (''AD'', ''AC'', ''AL'') then ''1''
 				else ''0''
 				end ||''|Myrddin|IPA'' AS PatientLinkId,
 		NULLIF(P.CERTIFIED,'''') AS NHSNumberStatus,
@@ -272,86 +278,13 @@ SELECT DISTINCT
 		
 	WHERE
 
-		t.trt_Type like ''A%'' and 
-		(e.end_date >=   ''' +@LastAttendanceDateString + '''   or		e.end_date is null )
-		and e.episodeno = ''1''
+		t.trt_Type in (''AD'', ''AL'', ''AC'')
+		and (e.end_date >=   ''' +@LastAttendanceDateString + '''   or		e.end_date is null ) 
+		and (e.episodeno = ''1'' or e.episodeno is null)
 
 
 
 
---		Union
-
-----discharge
---SELECT DISTINCT
---		T.actnotekey AS AttendanceIdentifier,
---		T.CASENO AS LocalPatientIdentifier,
---		NULLIF(P.NHS,'''') AS NHSNumber,
---		P.SURNAME AS Surname,
---		P.FORENAME AS Forename,
---		CAST(P.BIRTHDATE AS DATE) AS DateOfBirth,
---		P.SEX AS Gender,
---		P.TITLE AS Title,
---		CASE 
---			WHEN t.disdate >= CAST(P.POSTCODE_CHANDATE AS DATE) THEN P.ADDRESS
---			WHEN e.end_date = ''31 December 2999'' THEN null
---			when ah.caseno is null then P.ADDRESS
---			ELSE (SELECT FIRST 1 ADDRESS FROM PATIENT_ADDRESSHISTORY PAH WHERE PAH.CASENO=T.CASENO AND e.end_date BETWEEN PAH.STARTDATE AND PAH.ENDDATE ORDER BY SEQNO DESC)
---		END AS Address,
---		NULL AS Address1,
---		NULL AS Address2,
---		NULL AS Address3,
---		NULL AS Address4,
---		NULL AS Address5,
---		CASE 
---			WHEN t.disdate >= CAST(P.POSTCODE_CHANDATE AS DATE) THEN P.POSTCODE
---			WHEN e.end_date =  ''31 December 2999'' THEN null
---			when ah.caseno is null then P.POSTCODE
---			ELSE (SELECT FIRST 1 POSTCODE FROM PATIENT_ADDRESSHISTORY PAH WHERE PAH.CASENO=T.CASENO AND e.end_date BETWEEN PAH.STARTDATE AND PAH.ENDDATE ORDER BY SEQNO DESC)
---		END AS Postcode,
-		
---		CASE 
---			WHEN t.disdate >= CAST(p.GP_ChanDate AS DATE) THEN P.Registered_GP
---			WHEN e.end_date = ''31 December 2999'' THEN null
---			when gp.caseno is null then P.Registered_GP
---			ELSE (SELECT FIRST 1 P.Registered_GP FROM PATIENT_GPHISTORY GPH WHERE GPH.CASENO=T.CASENO AND e.end_date BETWEEN GPH.STARTDATE AND GPH.ENDDATE ORDER BY SEQNO DESC)
---		END AS RegisteredGP,
-
---				CASE 
---			WHEN t.disdate >= CAST(p.GP_ChanDate AS DATE) THEN p.GP_Practice
---			WHEN e.end_date = ''31 December 2999'' THEN null
---			when gp.caseno is null then p.GP_Practice
---			ELSE (SELECT FIRST 1 p.GP_Practice FROM PATIENT_GPHISTORY GPH WHERE GPH.CASENO=T.CASENO AND e.end_date BETWEEN GPH.STARTDATE AND GPH.ENDDATE ORDER BY SEQNO DESC)
---		END AS RegisteredPractice,
---		''East'' AS Area,
---		''Myrddin'' AS Source,
---		''IPAD'' AS Dataset,
---		T.actnotekey||''|East|''||  		Case
---		when e.episodeno is not null then cast(e.episodeno as int)
---				else ''0''
---				end ||''|Myrddin|IPAD'' AS PatientLinkId,
---		NULLIF(P.CERTIFIED,'''') AS NHSNumberStatus,
---		NULLIF(T.DHA_CODE,'''') AS DHA,
---		P.ETHNIC_ORIGIN AS Ethnicity
---	FROM 
---		TREATMNT T
---		LEFT JOIN PATIENT P ON T.CASENO = P.CASENO
---		left join episode e on e.linkid = t.linkid and t.trt_Type like ''A%''
---		left join patient_addresshistory ah on ah.caseno = t.caseno and ah.caseno is null
---		left join PATIENT_GPHISTORY GP on ah.caseno = t.caseno and gp.caseno is null
-		
---	WHERE
-
---		t.trt_Type like ''A%'' and 
---		(e.end_date >=   ''' +@LastAttendanceDateString + '''   or		e.end_date is null )
---						and 
-						
---		 (
---				SELECT FIRST 1 innerE.EpisodeNo 	FROM EPISODE innerE 
---				LEFT JOIN TREATMNT innerT ON innerE.LINKID=innerT.LINKID 
---				WHERE innerE.LINKID=e.LINKID
---				ORDER BY innerE.EpisodeNo DESC
---		) =1
-		
 
 
 

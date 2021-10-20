@@ -75,8 +75,10 @@ EXEC( '
 		''Central'' AS Area,
 		''WPAS'' AS Source,
 		''IPE'' AS Dataset,
-		T.actnotekey||''|Central|''||  		Case
-		when e.episodeno is not null then cast(e.episodeno as int)
+		T.actnotekey||''|Central|''||  		
+					Case
+						when e.episodeno is not null then cast(e.episodeno as int)
+						when e.episodeno is null and t.trt_Type  in (''AD'', ''AC'', ''AL'') then ''1''
 				else ''0''
 				end ||''|WPAS|IPE'' AS PatientLinkId,
 		NULLIF(P.CERTIFIED,'''') AS NHSNumberStatus,
@@ -201,8 +203,10 @@ SELECT DISTINCT
 		''Central'' AS Area,
 		''WPAS'' AS Source,
 		''IPA'' AS Dataset,
-		T.actnotekey||''|Central|''||  		Case
-		when e.episodeno is not null then cast(e.episodeno as int)
+		T.actnotekey||''|Central|''||  		
+						Case
+							when e.episodeno is not null then cast(e.episodeno as int)
+							when e.episodeno is null and t.trt_Type  in (''AD'', ''AC'', ''AL'') then ''1''
 				else ''0''
 				end ||''|WPAS|IPA'' AS PatientLinkId,
 		NULLIF(P.CERTIFIED,'''') AS NHSNumberStatus,
@@ -277,9 +281,9 @@ SELECT DISTINCT
 		
 	WHERE
 
-		t.trt_Type like ''A%'' and 
-		(e.end_date >=   ''' +@LastAttendanceDateString + '''   or		e.end_date is null )
-		and e.episodeno = ''1''
+		t.trt_Type in (''AD'', ''AL'', ''AC'')
+		and (e.end_date >=   ''' +@LastAttendanceDateString + '''   or		e.end_date is null ) 
+		and (e.episodeno = ''1'' or e.episodeno is null)
 
 
 
