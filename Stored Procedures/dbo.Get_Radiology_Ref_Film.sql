@@ -5,7 +5,7 @@ GO
 
 
 
-create PROCEDURE [dbo].[Get_Radiology_Ref_Film]
+CREATE PROCEDURE [dbo].[Get_Radiology_Ref_Film]
 	
 AS
 BEGIN
@@ -29,7 +29,7 @@ SELECT
 	'Radis' AS Source,
 	'Central' AS Area
 FROM 
-	[RADIS_CENTRAL].[Radis].dbo.Film
+	[RADIS_CENTRAL].[RadisReporting].dbo.Film
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -39,7 +39,7 @@ SELECT
 	'Radis' AS Source,
 	'East' AS Area
 FROM
-	[RADIS_EAST].[Radis].dbo.Film
+	[RADIS_EAST].[RadisReporting].dbo.Film
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -49,7 +49,7 @@ SELECT
 	'Radis' AS Source,
 	'West' AS Area
 FROM
-	[RADIS_WEST].[Radis].dbo.Film
+	[RADIS_WEST].[RadisReporting].dbo.Film
 
 UPDATE 
 	@Results

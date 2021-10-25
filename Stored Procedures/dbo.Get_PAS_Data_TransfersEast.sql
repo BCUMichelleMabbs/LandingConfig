@@ -9,6 +9,8 @@ GO
 
 
 
+
+
 -- ================================================================
 -- Author:		Champika Balasuriya
 -- Create date: July 2021
@@ -101,7 +103,8 @@ EXEC('select
               WHERE  
                      CAST(TRANS.TRANSFER_DATE AS DATE) >'''+@DateOfTransferString+''' 
                      --AND CAST(TRANS.TRANSFER_DATE AS DATE) <= '''+@DateOfTransferString+''' 
-                     AND TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'',''AE'') 
+                     AND TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'') 
+                     AND TRANS.TRANSFER_WARD is  not null
               
 UNION
               SELECT 
@@ -158,7 +161,8 @@ UNION
 			 WHERE 
                      CAST(TREAT.TRT_DATE AS DATE) > '''+@DateOfTransferString+''' 
                     -- AND CAST(TREAT.TRT_DATE AS DATE) <= '''+@DateOfTransferString+''' 
-                     AND TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'',''AE'') 
+                     AND TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'') 
+                     AND TRANS.TRANSFER_WARD is  not null
        ) 
               ORDER BY 
                      EventStartDate, SpellNumber'
@@ -173,6 +177,7 @@ END
 
 --SELECT ERROR_MESSAGE() ERROR ,ERROR_NUMBER() eNUMBER
 --END CATCH
+
 
 
 

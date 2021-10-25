@@ -3,7 +3,7 @@ GO
 SET ANSI_NULLS ON
 GO
 
-create PROCEDURE [dbo].[Get_Radiology_Ref_ExamGroup]
+CREATE PROCEDURE [dbo].[Get_Radiology_Ref_ExamGroup]
 	
 AS
 BEGIN
@@ -27,7 +27,7 @@ SELECT
 	'Radis' AS Source,
 	'Central' AS Area
 FROM 
-	[RADIS_CENTRAL].[Radis].dbo.ProcedureGroup
+	[RADIS_CENTRAL].[RadisReporting].dbo.ProcedureGroup
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -37,7 +37,7 @@ SELECT
 	'Radis' AS Source,
 	'East' AS Area
 FROM
-	[RADIS_EAST].[Radis].dbo.ProcedureGroup
+	[RADIS_EAST].[RadisReporting].dbo.ProcedureGroup
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -47,7 +47,7 @@ SELECT
 	'Radis' AS Source,
 	'West' AS Area
 FROM
-	[RADIS_WEST].[Radis].dbo.ProcedureGroup
+	[RADIS_WEST].[RadisReporting].dbo.ProcedureGroup
 
 UPDATE 
 	@Results

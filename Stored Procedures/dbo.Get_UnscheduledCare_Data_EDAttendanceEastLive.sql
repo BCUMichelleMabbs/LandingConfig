@@ -6,14 +6,16 @@ CREATE PROCEDURE [dbo].[Get_UnscheduledCare_Data_EDAttendanceEastLive]
 AS
 BEGIN
 SET NOCOUNT ON;
-
+declare @NHSid int 
+set @NHSid =(select top 1 lkp_id from [BCUED\BCUED_DB].EMIS_SYM_BCU_Live.dbo.Lookups where lkp_name = 'NHSNumber')
 SELECT DISTINCT
 
 	'East',
 	'WEDS',
 	pat_pid as SymphonyIdentifier, 
     --ISNULL(REPLACE(NHSV.psi_system_id,' ',''),'') AS NHSNumber, --CHANGED ON 11 JUNE 2021 DUE TO A DUPLICATE NHS NUMBER IN THE NHS NUMBER VIEW (SEE DEV TEAM CONVO FOR DETAILS)
-	(SELECT TOP 1 ISNULL(REPLACE(NHSV.psi_system_id,' ',''),'') FROM [BCUED\BCUED_DB].EMIS_SYM_BCU_Live.dbo.NHS_numbers_View NHSV WHERE NHSV.psi_pid = pat_pid) AS NHSNumber,
+	--(SELECT TOP 1 ISNULL(REPLACE(NHSV.psi_system_id,' ',''),'') FROM [BCUED\BCUED_DB].EMIS_SYM_BCU_Live.dbo.NHS_numbers_View NHSV WHERE NHSV.psi_pid = pat_pid) AS NHSNumber,
+	NULLIF(RTRIM((SELECT TOP 1 LEFT(psi_system_id,10) FROM [BCUED\BCUED_DB].EMIS_SYM_BCU_Live.dbo.patient_System_ids WHERE psi_system_name = @NHSid AND psi_pid=pat_pid)),'') AS NHSNumber,
     UPPER(RTRIM(pat_surname) + ', ' + RTRIM(pat_forename)) AS PatientName, 
 	pat_dob,
     CAST(a.atd_arrivaldate AS DATE) AS ArrivalDate, 

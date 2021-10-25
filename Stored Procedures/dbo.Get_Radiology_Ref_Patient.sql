@@ -67,10 +67,10 @@ Address1
 ,TranslatorRequired
 ,P.RadisNumber+'|'+pk_Patient_ID +'|'+'Central'+'|'+'Radis' as PatientLinkID
 
- from [RADIS_CENTRAL].Radis.dbo.Patient P 	
-             LEFT OUTER JOIN [RADIS_CENTRAL].Radis.dbo.Pregnancy AS preg  ON p.fk_Pregnancy_ID = preg.pk_Pregnancy_ID
-            LEFT OUTER JOIN [RADIS_CENTRAL].Radis.dbo.PregnancyStatus AS prst ON preg.fk_PregnancyStatus_ID = prst.pk_PregnancyStatus_ID
-			            LEFT OUTER JOIN [RADIS_CENTRAL].Radis.dbo.Language AS lan WITH ( NOLOCK ) ON p.fk_Language_ID = lan.pk_Language_ID
+ from [RADIS_CENTRAL].[RadisReporting].dbo.Patient P 	
+             LEFT OUTER JOIN [RADIS_CENTRAL].[RadisReporting].dbo.Pregnancy AS preg  ON p.fk_Pregnancy_ID = preg.pk_Pregnancy_ID
+            LEFT OUTER JOIN [RADIS_CENTRAL].[RadisReporting].dbo.PregnancyStatus AS prst ON preg.fk_PregnancyStatus_ID = prst.pk_PregnancyStatus_ID
+			            LEFT OUTER JOIN [RADIS_CENTRAL].[RadisReporting].dbo.Language AS lan WITH ( NOLOCK ) ON p.fk_Language_ID = lan.pk_Language_ID
 
 
 
@@ -133,10 +133,10 @@ Address1
 ,TranslatorRequired
 ,P.RadisNumber+'|'+pk_Patient_ID +'|'+'East'+'|'+'Radis' as PatientLinkID
 
- from [RADIS_East].Radis.dbo.Patient P 	
-             LEFT OUTER JOIN [RADIS_East].Radis.dbo.Pregnancy AS preg  ON p.fk_Pregnancy_ID = preg.pk_Pregnancy_ID
-            LEFT OUTER JOIN [RADIS_East].Radis.dbo.PregnancyStatus AS prst ON preg.fk_PregnancyStatus_ID = prst.pk_PregnancyStatus_ID
-			            LEFT OUTER JOIN [RADIS_East].Radis.dbo.Language AS lan WITH ( NOLOCK ) ON p.fk_Language_ID = lan.pk_Language_ID
+ from [RADIS_East].[RadisReporting].dbo.Patient P 	
+             LEFT OUTER JOIN [RADIS_East].[RadisReporting].dbo.Pregnancy AS preg  ON p.fk_Pregnancy_ID = preg.pk_Pregnancy_ID
+            LEFT OUTER JOIN [RADIS_East].[RadisReporting].dbo.PregnancyStatus AS prst ON preg.fk_PregnancyStatus_ID = prst.pk_PregnancyStatus_ID
+			            LEFT OUTER JOIN [RADIS_East].[RadisReporting].dbo.Language AS lan WITH ( NOLOCK ) ON p.fk_Language_ID = lan.pk_Language_ID
 
 
 union all 
@@ -198,10 +198,10 @@ Address1
 ,TranslatorRequired
 ,P.RadisNumber+'|'+pk_Patient_ID +'|'+'West'+'|'+'Radis' as PatientLinkID
 
- from [RADIS_West].Radis.dbo.Patient P 	
-             LEFT OUTER JOIN [RADIS_West].Radis.dbo.Pregnancy AS preg  ON p.fk_Pregnancy_ID = preg.pk_Pregnancy_ID
-            LEFT OUTER JOIN [RADIS_West].Radis.dbo.PregnancyStatus AS prst ON preg.fk_PregnancyStatus_ID = prst.pk_PregnancyStatus_ID
-			            LEFT OUTER JOIN [RADIS_West].Radis.dbo.Language AS lan WITH ( NOLOCK ) ON p.fk_Language_ID = lan.pk_Language_ID
+ from [RADIS_West].[RadisReporting].dbo.Patient P 	
+             LEFT OUTER JOIN [RADIS_West].[RadisReporting].dbo.Pregnancy AS preg  ON p.fk_Pregnancy_ID = preg.pk_Pregnancy_ID
+            LEFT OUTER JOIN [RADIS_West].[RadisReporting].dbo.PregnancyStatus AS prst ON preg.fk_PregnancyStatus_ID = prst.pk_PregnancyStatus_ID
+			            LEFT OUTER JOIN [RADIS_West].[RadisReporting].dbo.Language AS lan WITH ( NOLOCK ) ON p.fk_Language_ID = lan.pk_Language_ID
 
 end
 GO

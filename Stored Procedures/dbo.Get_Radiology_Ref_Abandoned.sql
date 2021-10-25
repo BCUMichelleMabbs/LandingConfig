@@ -3,7 +3,7 @@ GO
 SET ANSI_NULLS ON
 GO
 
-create PROCEDURE [dbo].[Get_Radiology_Ref_Abandoned]
+CREATE PROCEDURE [dbo].[Get_Radiology_Ref_Abandoned]
 	
 AS
 BEGIN
@@ -27,7 +27,7 @@ SELECT
 	'Radis' AS Source,
 	'Central' AS Area
 FROM 
-	[RADIS_CENTRAL].[Radis].dbo.Abandoned
+	[RADIS_CENTRAL].RadisReporting.dbo.Abandoned
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -37,7 +37,7 @@ SELECT
 	'Radis' AS Source,
 	'East' AS Area
 FROM
-	[RADIS_EAST].[Radis].dbo.Abandoned
+	[RADIS_EAST].RadisReporting.dbo.Abandoned
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -47,7 +47,7 @@ SELECT
 	'Radis' AS Source,
 	'West' AS Area
 FROM
-	[RADIS_WEST].[Radis].dbo.Abandoned
+	[RADIS_WEST].RadisReporting.dbo.Abandoned
 
 UPDATE 
 	@Results

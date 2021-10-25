@@ -124,7 +124,7 @@ SELECT DISTINCT
 	,ISNULL(CONVERT(varchar,v3.udv_string),'N')  as WGReportable
 	,CASE WHEN v4.udv_string = 'SENSIT' then 'Y' else 'N' END as SensitiveIssue
 	,getdate() as LastUpdated
-	,CASE WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'Y' AND inc_clin_detail = 'ULCER' THEN 1 ELSE NULL END as HAPUCount
+	,CASE WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'Y' AND inc_clin_detail = 'ULCER' THEN 1 WHEN inc_clin_detail = 'ULCER' THEN 1 WHEN NULLIF(CONVERT(varchar,v.udv_string),'') IS NOT NULL THEN 1 ELSE NULL END as HAPUCount
 	,case when inc_clin_detail = 'FALLS' then 1 else null end as FallCount
 	,Case when inc_carestage = 'MEDIC' then 1 else null end as MedErrorCount
 	,NULLIF(inc_dmda,'') as [ReportedToMHRA]
@@ -186,6 +186,8 @@ SELECT DISTINCT
 	,ISNULL(CONVERT(Varchar,v35.udv_string),'N') as PatientDebrief
 	,ISNULL(CONVERT(Varchar,v36.udv_string),'N') as StaffDebrief
 	,ISNULL(CONVERT(Varchar,v37.udv_string),'N') as PBS
+	--AWPUT
+	,ISNULL(CONVERT(Varchar,v38.udv_string),'N') as AWPUT
 
 FROM [7a1ausrvdtxsql2].[Datixcrm].dbo.incidents_main m
 	LEFT JOIN [7a1ausrvdtxsql2].[Datixcrm].[dbo].[udf_values] v on v.cas_id = m.recordid and v.field_id = 1 and v.group_id = 10
@@ -227,6 +229,10 @@ FROM [7a1ausrvdtxsql2].[Datixcrm].dbo.incidents_main m
 	LEFT JOIN [7a1ausrvdtxsql2].[Datixcrm].[dbo].[udf_values] v35 on v35.cas_id = m.recordid and v35.field_id = 361
 	LEFT JOIN [7a1ausrvdtxsql2].[Datixcrm].[dbo].[udf_values] v36 on v36.cas_id = m.recordid and v36.field_id = 464
 	LEFT JOIN [7a1ausrvdtxsql2].[Datixcrm].[dbo].[udf_values] v37 on v37.cas_id = m.recordid and v37.field_id = 357
+	--AWPUT
+	LEFT JOIN [7a1ausrvdtxsql2].[Datixcrm].[dbo].[udf_values] v38 on v38.cas_id = m.recordid and v38.field_id = 330
+
+
 
 END
 GO

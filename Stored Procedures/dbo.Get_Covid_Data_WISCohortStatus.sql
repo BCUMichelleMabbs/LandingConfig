@@ -7,7 +7,7 @@ CREATE PROCEDURE [dbo].[Get_Covid_Data_WISCohortStatus] AS BEGIN
 with v1 as 
 (
 SELECT v.NHSNumber, v.VaccinationDate, v.VaccinationLocationName, v.VaccinationVaccineName, 'Vaccinated - Dose 1' as Status, v.VaccinationLocationCode,
-ROW_NUMBER() OVER (PARTITION BY v.NHSNumber ORDER BY v.VaccinationDateTime) as rn
+ROW_NUMBER() OVER (PARTITION BY v.NHSNumber ORDER BY v.VaccinationDate) as rn
 FROM Foundation.dbo.Covid_Data_WISVaccination v
 WHERE 1=1 
 --and v.PossibleDuplicateWithin19Days is null

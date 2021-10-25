@@ -27,7 +27,7 @@ SELECT
 	'Radis' AS Source,
 	'Central' AS Area
 FROM 
-	[RADIS_CENTRAL].[Radis].dbo.ProcedureCode
+	[RADIS_CENTRAL].[RadisReporting].dbo.ProcedureCode
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -37,7 +37,7 @@ SELECT
 	'Radis' AS Source,
 	'East' AS Area
 FROM
-	[RADIS_EAST].[Radis].dbo.ProcedureCode
+	[RADIS_EAST].[RadisReporting].dbo.ProcedureCode
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -47,7 +47,7 @@ SELECT
 	'Radis' AS Source,
 	'West' AS Area
 FROM
-	[RADIS_WEST].[Radis].dbo.ProcedureCode
+	[RADIS_WEST].[RadisReporting].dbo.ProcedureCode
 
 UPDATE 
 	@Results

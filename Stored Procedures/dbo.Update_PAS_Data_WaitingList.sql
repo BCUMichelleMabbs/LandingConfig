@@ -9,6 +9,7 @@ GO
 -- Post Foundation Procedure for the Waiting List Dataset
 -- Based on Ardentia Derive Rule : XWL_FUREPFLAG
 --          Ardentia View        : XWL_ALL_FUWL
+--          NwwIntegration View  : Vw_RTT_BCU_PTL_Daily (vW_RTT_WPAS_PTL_Daily/vW_RTT_East_PTL_Daily/vW_RTT_West_PTL_Daily)
 --
 --------------------------------------------------------
 CREATE Procedure [dbo].[Update_PAS_Data_WaitingList]
@@ -19,10 +20,13 @@ begin
 Update [Foundation].[dbo].[PAS_Data_WaitingList]
 Set
 
-DaysToTarget  = DATEDIFF(d, W.DateOnWaitingList, w.DateBooked),
+--Source=Ardentia view XWL_all_fuwl
+DaysToTarget  = DATEDIFF(d, W.DateOnWaitingList, w.DateBooked),-- newtargetdaet1/originaltargetdate
 DaysToCurrent = DATEDIFF(d, W.DateOnWaitingList, w.DateWaitingListCensus),
-DaysFromBookedToCurrent = DATEDIFF(d, w.DateBooked,w.DateWaitingListCensus),
+DaysFromBookedToCurrent = DATEDIFF(d, w.DateBooked,w.DateWaitingListCensus),-- original is Days_OU
 
+
+-- Source=Ardentia.Derive_XWL_FURepFlag
 pc25_flag=CASE WHEN (CASE WHEN datediff(d, W.DateOnWaitingList, w.DateBooked) = 0 THEN 0 
 	            ELSE datediff(d, W.DateOnWaitingList, w.DateWaitingListCensus) * 1.0 / datediff(d, W.DateOnWaitingList, w.DateBooked) 
 		        END) > 1.25 THEN 'Y' 
@@ -61,6 +65,7 @@ PCOver100Flag = CASE WHEN (CASE WHEN datediff(d , w.DateOnWaitingList , w.DateBo
 						  ELSE 'N' 
 						  END,   
 
+-- Source=Ardentia.Derive_XWL_FURepFlag
  ReportableFlag = CASE WHEN w.Area in ('East','Central') and w.CommentsOfReferral ='Awaiting Diagnostics' then 'N'
 	                   WHEN w.Specialty in ('320100','320200') THEN 'N' 
 	                   WHEN w.Specialty like '160%' then 'N'
@@ -95,12 +100,13 @@ ValidFlag = 'Y'
 
 from [Foundation].[dbo].[PAS_Data_WaitingList] w
 WHERE Load_GUID = @Load_GUID
-and WaitingListType in ('IP','DC','OP','FU','FB','EF','EN')
+and WaitingListType in ('IP','DC','OP','FU','FB','EF','EN')  -- updating all doesn't matter no?
 
 END
 
+-------
 
-
+-- This is the update as a select so you can check derived value quickly
 /*
 select 
 Area, 
