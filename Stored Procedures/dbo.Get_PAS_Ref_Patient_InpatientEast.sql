@@ -77,8 +77,7 @@ EXEC( '
 		''Myrddin'' AS Source,
 		''IPE'' AS Dataset,
 		T.actnotekey||''|East|''||  		
-		T.actnotekey||''|Central|''||  		
-					Case
+							Case
 						when e.episodeno is not null then cast(e.episodeno as int)
 						when e.episodeno is null and t.trt_Type  in (''AD'', ''AC'', ''AL'') then ''1''
 				else ''0''
@@ -203,7 +202,7 @@ SELECT DISTINCT
 		''Myrddin'' AS Source,
 		''IPA'' AS Dataset,
 		T.actnotekey||''|East|''||  		
-		T.actnotekey||''|Central|''||  		
+			
 					Case
 						when e.episodeno is not null then cast(e.episodeno as int)
 						when e.episodeno is null and t.trt_Type  in (''AD'', ''AC'', ''AL'') then ''1''

@@ -284,7 +284,9 @@ BEGIN
 				ELSE SUBSTRING(T.Arrival_TIME FROM 1 FOR 2)||'':''||SUBSTRING(T.Arrival_TIME FROM 3 FOR 2) 
 			END AS TimeArrivedAtAppointment,
 
-						nullif(rtrim(T.next_appt_Spec), '''') as SpecialtyOfNextAppointment
+			nullif(rtrim(T.next_appt_Spec), '''') as SpecialtyOfNextAppointment,
+			null as Diagnosis1,
+			null as Diagnosis2
 			
 		FROM
 			TREATMNT T

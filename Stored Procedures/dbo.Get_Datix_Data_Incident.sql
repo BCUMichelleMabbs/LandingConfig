@@ -120,11 +120,13 @@ SELECT DISTINCT
 	,NULLIF(inc_inv_lessons,'') as InvestigationLessons
 	,NULLIF(inc_submittedtime,'') as SubmittedTime
 	,NULLIF(CONVERT(varchar,v.udv_string),'') as UlcerGrade
-	,CASE WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'Y' AND inc_clin_detail = 'ULCER' THEN 'Y' WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'N' AND inc_clin_detail = 'ULCER' THEN 'N' ELSE NULL END as HAPU 
+	,CASE WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'Y' AND inc_clin_detail = 'ULCER' THEN 'Y' WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'N' THEN 'N' ELSE NULL END as HAPU 
 	,ISNULL(CONVERT(varchar,v3.udv_string),'N')  as WGReportable
 	,CASE WHEN v4.udv_string = 'SENSIT' then 'Y' else 'N' END as SensitiveIssue
 	,getdate() as LastUpdated
-	,CASE WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'Y' AND inc_clin_detail = 'ULCER' THEN 1 WHEN inc_clin_detail = 'ULCER' THEN 1 WHEN NULLIF(CONVERT(varchar,v.udv_string),'') IS NOT NULL THEN 1 ELSE NULL END as HAPUCount
+	,CASE WHEN NULLIF(CONVERT(Varchar,v2.udv_string),'') = 'Y' AND inc_clin_detail = 'ULCER' THEN 1 ELSE NULL END as HAPUCount
+	--WHEN NULLIF(CONVERT(varchar,v.udv_string),'') IS NOT NULL THEN 1 
+	--WHEN inc_clin_detail = 'ULCER' THEN 1 
 	,case when inc_clin_detail = 'FALLS' then 1 else null end as FallCount
 	,Case when inc_carestage = 'MEDIC' then 1 else null end as MedErrorCount
 	,NULLIF(inc_dmda,'') as [ReportedToMHRA]

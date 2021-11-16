@@ -44,6 +44,17 @@ WHERE
 	RFVDM_CODE='ATCAT'
  
 
+ 	INSERT INTO @Results(LocalCode,LocalName,Source)
+(
+Select Distinct
+		a.AttendanceCategory as LocalCode,
+		NULL as LocalName,
+		a.Source as Source
+From Foundation.dbo.UnscheduledCare_Data_EDAttendance a
+left join mapping.dbo.UnscheduledCare_AttendanceCategory_Map as tc on rtrim(ltrim(upper(tc.LocalCode))) = ltrim(rtrim(upper(a.AttendanceCategory))) and a.source = 'OldWH' 
+where a.AttendanceCategory is not null
+)
+
 
 UPDATE @Results SET
 	R.MainCode = AC.MainCode,
@@ -54,5 +65,6 @@ FROM
 	INNER JOIN Mapping.dbo.UnscheduledCare_AttendanceCategory AC ON ACM.MainCode=AC.MainCode
 
 SELECT * FROM @Results
+order by maincode
 END
 GO

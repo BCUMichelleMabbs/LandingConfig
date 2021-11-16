@@ -12,50 +12,75 @@ BEGIN
 	SET NOCOUNT ON;
 
 DECLARE @Results AS TABLE(
-	MainCode			VARCHAR(50),
-	Name				VARCHAR(100),
-	LocalCode			VARCHAR(50),
-	LocalName			VARCHAR(100),
-	Source				VARCHAR(5),
-	Area				VARCHAR(8)
+	Source				VARCHAR(15),
+	Area				VARCHAR(15),
+	UserDetailID		VARCHAR(100),
+	UserID				VARCHAR(100),
+	Surname				VARCHAR(50),
+	Forenames			VARCHAR(100),
+	Title				VARCHAR(100),
+	Active				 int,
+	RoleID				VARCHAR(100),
+	JobDescription		VARCHAR(100)
+
 )
 
 
-INSERT INTO @Results(LocalCode,LocalName,Source,Area)
+INSERT INTO @Results(Source,Area,UserDetailID,UserID,Surname,Forenames,Title,Active,RoleID,JobDescription)
 SELECT
-	Code AS LocalCode,
-	Description AS LocalName,
 	'Radis' AS Source,
-	'Central' AS Area
+	'Central' AS Area,
+	PK_Userdetail_ID as UserDetailID,
+	UserID,
+	Surname,
+	Forenames,
+	Title,
+	Active,
+	fk_Role_ID   as  RoleID,
+	JobDescription
+
 FROM 
-	[RADIS_CENTRAL].[Radis].dbo.Abandoned
+	[RADIS_CENTRAL].[RadisReporting].dbo.UserDetail
 
 
-INSERT INTO @Results(LocalCode,LocalName,Source,Area)
+INSERT INTO @Results(Source,Area,UserDetailID,UserID,Surname,Forenames,Title,Active,RoleID,JobDescription)
 SELECT
-	Code AS LocalCode,
-	Description AS LocalName,
-	'Radis' AS Source,
-	'East' AS Area
+'Radis' AS Source,
+	'East' AS Area,
+	PK_Userdetail_ID as UserDetailID,
+	UserID,
+	Surname,
+	Forenames,
+	Title,
+	Active,
+	fk_Role_ID   as  RoleID,
+	JobDescription
+	
 FROM
-	[RADIS_EAST].[Radis].dbo.Abandoned
+	[RADIS_EAST].[RadisReporting].dbo.UserDetail
 
 
-INSERT INTO @Results(LocalCode,LocalName,Source,Area)
+INSERT INTO @Results(Source,Area,UserDetailID,UserID,Surname,Forenames,Title,Active,RoleID,JobDescription)
 SELECT
-	Code AS LocalCode,
-	Description AS LocalName,
+	PK_Userdetail_ID as UserDetailID,
+	UserID,
+	Surname,
+	Forenames,
+	Title,
+	Active,
+	fk_Role_ID   as  RoleID,
+	JobDescription,
 	'Radis' AS Source,
 	'West' AS Area
 FROM
-	[RADIS_WEST].[Radis].dbo.Abandoned
+	[RADIS_WEST].[RadisReporting].dbo.UserDetail
 
-UPDATE 
-	@Results
-SET
-	MainCode=LocalCode,
-	Name=LocalName
+--UPDATE 
+--	@Results
+--SET
+--	MainCode=LocalCode,
+--	Name=LocalName
 
-SELECT * FROM @Results ORDER BY Area,LocalCode
+SELECT * FROM @Results ORDER BY Area
 end
 GO

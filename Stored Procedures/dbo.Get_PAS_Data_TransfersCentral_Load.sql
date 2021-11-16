@@ -3,7 +3,7 @@ GO
 SET ANSI_NULLS ON
 GO
 
-CREATE PROCEDURE [dbo].[Get_PAS_Data_TransfersCentral]
+CREATE PROCEDURE [dbo].[Get_PAS_Data_TransfersCentral_Load]
 
 AS
 
@@ -11,12 +11,45 @@ BEGIN
 
 DECLARE @DateOfTransfer AS DATE = (SELECT ISNULL(MAX(EventEndDate),'1 January 2017') FROM [Foundation].[dbo].[PAS_Data_Transfers] where Area = 'Central')
 DECLARE @DateOfTransferString AS VARCHAR(30) = DATENAME(DAY,@DateOfTransfer) + ' ' + DATENAME(MONTH,@DateOfTransfer) + ' ' + DATENAME(YEAR,@DateOfTransfer)
+DECLARE @Load_Guid VARCHAR(38)
+
+SET @Load_Guid = newid();
 
 
 
+IF OBJECT_ID(N'tempdb..#Trial') IS NOT NULL
+BEGIN
+DROP TABLE #Trial
+END 
 
 
 
+CREATE TABLE #Trial(
+
+    [Area] [varchar](255) NULL,
+    [Source] [varchar](255) NULL,
+	[LocalPatientIdentifier] [varchar](255) NULL,
+	[SpellNumber] [varchar](20) NULL,
+	[EpisodeNo] [int] NULL,
+	[PatientLinkIdEpisode]  AS (((((((CONVERT([varchar],[SpellNumber])+'|')+CONVERT([varchar],[Area]))+'|')+CONVERT([varchar],[EpisodeNo]))+'|')+CONVERT([varchar],[Source]))+'|IPE'),
+	[AdmissionMethod] [varchar](220) NULL,
+	[DischargeMethod] [varchar](20) NULL,
+	[EVENTSTARTDATE] [datetime2](7) NULL,
+	[EVENTSTARTTIME] [time](7) NULL,
+	[EVENTENDDATE] [datetime2](7) NULL,
+	[EVENTENDTIME] [time](7) NULL,
+	[Consultant] [varchar](20) null,
+	[PREVIOUSWARD] [varchar](20) NULL,
+	[Ward] [varchar](20) NULL,
+	[NEXTWARD] [varchar](20) NULL,
+	[Specialty] [varchar](20) NULL,
+	[LastUpdate] [datetime2](7) NULL,
+	[DischargeDestination] [varchar](20) NULL,
+	[TransferNumber] [int] NULL
+
+	)
+
+INSERT INTO #Trial 
 
 exec('   
 
@@ -89,9 +122,9 @@ exec('
                      LEFT JOIN PATIENT PAT ON TREAT.CASENO= PAT.CASENO
 
  WHERE  
-                   CAST(TRANS.TRANSFER_DATE AS DATE) >'''+@DateOfTransferString+''' 
+                  -- CAST(TRANS.TRANSFER_DATE AS DATE) >'''+@DateOfTransferString+''' 
                      --AND CAST(TRANS.TRANSFER_DATE AS DATE) <= '''+@DateOfTransferString+''' 
-                     AND TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'') 
+                     TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'') 
                      AND TRANS.TRANSFER_WARD is  not null
 
 
@@ -152,9 +185,9 @@ UNION
                      LEFT JOIN PATIENT PAT ON TREAT.CASENO= PAT.CASENO
 			 WHERE  
 			
-                    CAST(TREAT.TRT_DATE AS DATE) > '''+@DateOfTransferString+''' 
+                    --CAST(TREAT.TRT_DATE AS DATE) > '''+@DateOfTransferString+''' 
                      --AND CAST(TREAT.TRT_DATE AS DATE) <= '''+@DateOfTransferString+''' 
-                     AND TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'') 
+                      TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'') 
 --                     AND TRANS.TRANSFER_WARD is  not null
 
 
@@ -166,9 +199,132 @@ UNION
 					 
 					
 					 
-				 '
+					 '
 ) AT [WPAS_Central];  
 
+--SELECT * FROM #Trial ;
+
+;WITH final_transfer
+
+AS
+(
+SELECT
+    [Area],
+	[Source],
+	[LocalPatientIdentifier],
+	[SpellNumber],
+	[EpisodeNo],
+	[PatientLinkIdEpisode],
+	[AdmissionMethod],
+	[DischargeMethod],
+	[EVENTSTARTDATE],
+	[EVENTSTARTTIME],
+	[EVENTENDDATE],
+	[EVENTENDTIME],
+	[Consultant],
+	[PREVIOUSWARD],
+	[Ward] ,
+	[NEXTWARD],
+	[Specialty],
+	[LastUpdate],
+	[DischargeDestination],
+	[TransferNumber],
+    ROW_NUMBER() OVER(PARTITION BY [SpellNumber],[WARD] ORDER BY [EVENTENDTIME]) AS rowid  FROM  #Trial
+),
+
+--SELECT * FROM final_transfer ;
+
+final_transfer1
+
+AS(
+
+SELECT 
+    [Area],
+    [Source],
+	[LocalPatientIdentifier],
+	[SpellNumber],
+	[EpisodeNo],
+	[PatientLinkIdEpisode],
+	[AdmissionMethod],
+	[DischargeMethod],
+	[EVENTSTARTDATE],
+	[EVENTSTARTTIME],
+	[EVENTENDDATE],
+	[EVENTENDTIME],
+	[Consultant],
+	[PREVIOUSWARD],
+	[Ward] ,
+	[NEXTWARD],
+	[Specialty],
+	[LastUpdate],
+	[DischargeDestination],
+	[TransferNumber] AS TransferNumber_bckup
+
+FROM
+
+final_transfer
+WHERE rowid =  1
+
+) 
+
+--SELECT * FROM final_transfer1 ;
+INSERT 
+
+INTO Foundation.dbo.PAS_Data_TransfersII
+(
+    Load_Guid,
+    [LoadDate],
+	[Area],
+    [Source],
+	[LocalPatientIdentifier],
+	[ProviderSpellNumber],
+	[EpisodeNumber],
+	--[PatientLinkIdEpisode],
+	[AdmissionMethod],
+	[DischargeMethod],
+	[EVENTSTARTDATE],
+	[EVENTSTARTTIME],
+	[EVENTENDDATE],
+	[EVENTENDTIME],
+	[HCP],
+	[PREVIOUSWARD],
+	[Ward] ,
+	[NEXTWARD],
+	[Specialty],
+	[LastUpdate],
+	[DischargeDestination],
+	TransferNumber
+	)
+SELECT 
+    @Load_Guid,
+	GETDATE(),
+	[Area],
+    [Source],
+	[LocalPatientIdentifier],
+	[SpellNumber],
+	[EpisodeNo],
+	--[PatientLinkIdEpisode],
+	[AdmissionMethod],
+	[DischargeMethod],
+	[EVENTSTARTDATE],
+	[EVENTSTARTTIME],
+	[EVENTENDDATE],
+	[EVENTENDTIME],
+	[Consultant],
+	[PREVIOUSWARD],
+	[Ward] ,
+	[NEXTWARD],
+	[Specialty],
+	[LastUpdate],
+	[DischargeDestination],
+	--TransferNumber_bckup,
+    ROW_NUMBER() OVER(PARTITION BY [SpellNumber] ORDER BY [TransferNumber_bckup]) -1 AS TransferNumber  
+   
+     FROM  final_transfer1
+
+	 ORDER BY  [SpellNumber] 
+     
+	 ;
 
 
 

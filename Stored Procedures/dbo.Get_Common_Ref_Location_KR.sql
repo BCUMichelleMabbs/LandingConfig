@@ -254,21 +254,21 @@ and i.ward not in ('7A1A2', 'CA4AA')
 
 
 
-INSERT INTO @Results(LocalCode,LocalName,Source,Area)
-  	SELECT distinct
-		CAST(Lkp_ID AS VARCHAR(10)) AS LocalCode,
-		Lkp_Name AS LocalName,
-		'Symphony' AS Source,
-		'East' AS Area
-	FROM
-		[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Reports].dbo.Lookups
-	WHERE
-		Lkp_ParentID=5828
+--INSERT INTO @Results(LocalCode,LocalName,Source,Area)
+--  	SELECT distinct
+--		CAST(Lkp_ID AS VARCHAR(10)) AS LocalCode,
+--		Lkp_Name AS LocalName,
+--		'Symphony' AS Source,
+--		'East' AS Area
+--	FROM
+--		[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Reports].dbo.Lookups
+--	WHERE
+--		Lkp_ParentID=5828
 
 
 
 	INSERT INTO @Results(LocalCode,LocalName,Source,Area)
-	values ('7A1A4', 'Wrexham Maelor Hospital', 'Symphony', 'East'),
+	values ('7A1A4', 'Wrexham Maelor Hospital', 'WEDS', 'East'),
 			 ('7A1AU', 'Ysbyty Gwynedd', 'WEDS', 'West'),
 			 ('7A1CA', 'Alltwen', 'WEDS', 'West'),
 			 ('7A1AX', 'Bryn Beryl Hospital', 'WEDS', 'West'),
@@ -276,7 +276,8 @@ INSERT INTO @Results(LocalCode,LocalName,Source,Area)
 			 ('7A1B2', 'Tywyn & District War Memorial Hospital', 'WEDS', 'West'),
 			 ('7A1DC', 'Penrhos Stanley Hospital', 'WEDS', 'West'),
 			 ('7A1AY', 'Dolgellau Hospital', 'WEDS', 'West'),
-			('7A1A1', 'Ysbyty Gwynedd', 'WPAS', 'Central')
+			('7A1A1', 'Ysbyty Glan Clwyd', 'WPAS', 'Central'),
+			('7A1AD', 'Mold Community Hospital', 'WEDS', 'East')
 
 		
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)

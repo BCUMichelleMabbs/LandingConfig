@@ -69,6 +69,20 @@ WHERE
 	RFVDM_CODE='AEPGR'
 
 
+
+		INSERT INTO @Results(LocalCode,LocalName,Source)
+(
+Select Distinct
+		a.PatientGroup as LocalCode,
+		NULL as LocalName,
+		a.Source as Source
+From Foundation.dbo.UnscheduledCare_Data_EDAttendance a
+left join mapping.dbo.UnscheduledCare_PatientGroup_Map as tc on rtrim(ltrim(upper(tc.LocalCode))) = ltrim(rtrim(upper(a.PatientGroup))) and a.source = 'OldWH' 
+where a.PatientGroup is not null
+)
+
+
+
 --UPDATE @Results SET 
 --	MainCode=
 --		CASE 
@@ -106,6 +120,6 @@ FROM
 
 
 SELECT * FROM @Results
-
+order by maincode
 END
 GO

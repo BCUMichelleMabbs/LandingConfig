@@ -3,7 +3,7 @@ GO
 SET ANSI_NULLS ON
 GO
 
-CREATE PROCEDURE [dbo].[Get_PAS_Data_TransfersCentral]
+create PROCEDURE [dbo].[Get_PAS_Data_TransfersCentral1]
 
 AS
 
@@ -15,8 +15,38 @@ DECLARE @DateOfTransferString AS VARCHAR(30) = DATENAME(DAY,@DateOfTransfer) + '
 
 
 
+--IF OBJECT_ID(N'tempdb..#Trial') IS NOT NULL
+--BEGIN
+--DROP TABLE #Trial
+--END 
 
 
+
+DECLARE @Trial AS TABLE	(
+
+    [Area] [varchar](255) NULL,
+    [Source] [varchar](255) NULL,
+	[LocalPatientIdentifier] [varchar](255) NULL,
+	[SpellNumber] [varchar](20) NULL,
+	[EpisodeNo] [int] NULL,
+	[AdmissionMethod] [varchar](220) NULL,
+	[DischargeMethod] [varchar](20) NULL,
+	[EVENTSTARTDATE] [datetime2](7) NULL,
+	[EVENTSTARTTIME] [time](7) NULL,
+	[EVENTENDDATE] [datetime2](7) NULL,
+	[EVENTENDTIME] [time](7) NULL,
+	[Consultant] [varchar](20) null,
+	[PREVIOUSWARD] [varchar](20) NULL,
+	[Ward] [varchar](20) NULL,
+	[NEXTWARD] [varchar](20) NULL,
+	[Specialty] [varchar](20) NULL,
+	[LastUpdate] [datetime2](7) NULL,
+	[DischargeDestination] [varchar](20) NULL,
+	[TransferNumber] [int] NULL
+
+	)
+
+INSERT INTO @Trial 
 
 exec('   
 
@@ -166,9 +196,101 @@ UNION
 					 
 					
 					 
-				 '
-) AT [WPAS_Central];  
+					 '
+) AT [WPAS_Central];
 
+SELECT * FROM @Trial ;
+
+--;WITH final_transfer
+
+--AS
+--(
+--SELECT
+--    [Area],
+--	[Source],
+--	[LocalPatientIdentifier],
+--	[SpellNumber],
+--	[EpisodeNo],
+--	[AdmissionMethod],
+--	[DischargeMethod],
+--	[EVENTSTARTDATE],
+--	[EVENTSTARTTIME],
+--	[EVENTENDDATE],
+--	[EVENTENDTIME],
+--	[Consultant],
+--	[PREVIOUSWARD],
+--	[Ward] ,
+--	[NEXTWARD],
+--	[Specialty],
+--	[LastUpdate],
+--	[DischargeDestination],
+--	[TransferNumber],
+--    ROW_NUMBER() OVER(PARTITION BY [SpellNumber],[WARD] ORDER BY [EVENTENDTIME]) AS rowid  FROM  #Trial
+--),
+
+----SELECT * FROM final_transfer ;
+
+--final_transfer1
+
+--AS(
+
+--SELECT 
+--    [Area],
+--    [Source],
+--	[LocalPatientIdentifier],
+--	[SpellNumber],
+--	[EpisodeNo],
+--	[AdmissionMethod],
+--	[DischargeMethod],
+--	[EVENTSTARTDATE],
+--	[EVENTSTARTTIME],
+--	[EVENTENDDATE],
+--	[EVENTENDTIME],
+--	[Consultant],
+--	[PREVIOUSWARD],
+--	[Ward] ,
+--	[NEXTWARD],
+--	[Specialty],
+--	[LastUpdate],
+--	[DischargeDestination],
+--	[TransferNumber] AS TransferNumber_bckup
+
+--FROM
+
+--final_transfer
+--WHERE rowid =  1
+
+--) 
+
+----SELECT * FROM final_transfer1 ;
+
+--SELECT 
+--    [Area],
+--    [Source],
+--	[LocalPatientIdentifier],
+--	[SpellNumber],
+--	[EpisodeNo],
+--	[AdmissionMethod],
+--	[DischargeMethod],
+--	[EVENTSTARTDATE],
+--	[EVENTSTARTTIME],
+--	[EVENTENDDATE],
+--	[EVENTENDTIME],
+--	[Consultant],
+--	[PREVIOUSWARD],
+--	[Ward] ,
+--	[NEXTWARD],
+--	[Specialty],
+--	[LastUpdate],
+--	[DischargeDestination],
+--	--TransferNumber_bckup,
+--    ROW_NUMBER() OVER(PARTITION BY [SpellNumber] ORDER BY [TransferNumber_bckup]) -1 AS TransferNumber  
+   
+--     FROM  final_transfer1
+
+--	 ORDER BY  [SpellNumber] 
+     
+--	 ;
 
 
 

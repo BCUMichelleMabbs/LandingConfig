@@ -20,16 +20,16 @@ DECLARE @Results AS TABLE(
 	Colour		VARCHAR(50)
 )
 
-INSERT INTO @Results(LocalCode,LocalName,Source)
-SELECT
-	--Lkp_ID AS LocalCode,
-	Lkp_Name AS LocalCode,
-	Lkp_Name AS LocalName,
-	'Symphony' AS Source
-FROM 
-	[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Live].dbo.Lookups
-WHERE
-	Lkp_ParentID=5660
+--INSERT INTO @Results(LocalCode,LocalName,Source)
+--SELECT
+--	--Lkp_ID AS LocalCode,
+--	Lkp_Name AS LocalCode,
+--	Lkp_Name AS LocalName,
+--	'Symphony' AS Source
+--FROM 
+--	[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Live].dbo.Lookups
+--WHERE
+--	Lkp_ParentID=5660
 
 INSERT INTO @Results(LocalCode,LocalName,Source)
 SELECT
@@ -70,6 +70,21 @@ FROM
 WHERE
 	RFVDM_CODE='TRCAT'
 
+
+INSERT INTO @Results(LocalCode,LocalName,Source)
+(
+Select Distinct
+		a.TriageCategory as LocalCode,
+		NULL as LocalName,
+		a.Source as Source
+From Foundation.dbo.UnscheduledCare_Data_EDAttendance a
+left join mapping.dbo.UnscheduledCare_TriageCategory_Map as tc on rtrim(ltrim(upper(tc.LocalCode))) = ltrim(rtrim(upper(a.TriageCategory))) and a.source = 'OldWH' 
+where a.TriageCategory is not null
+)
+
+
+
+
 UPDATE @Results SET
 	R.MainCode = TC.MainCode,
 	R.Name = TC.Name,
@@ -82,5 +97,6 @@ FROM
 
 
 SELECT * FROM @Results
+ORDER BY MainCode
 END
 GO

@@ -32,7 +32,7 @@ SELECT
 	'Radis' AS Source,
 	'Central' AS Area
 FROM 
-	[RADIS_CENTRAL].[Radis].dbo.Priority
+	[RADIS_CENTRAL].[RadisReporting].dbo.Priority
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -42,7 +42,7 @@ SELECT
 	'Radis' AS Source,
 	'East' AS Area
 FROM
-	[RADIS_EAST].[Radis].dbo.Priority
+	[RADIS_EAST].[RadisReporting].dbo.Priority
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -52,7 +52,7 @@ SELECT
 	'Radis' AS Source,
 	'West' AS Area
 FROM
-	[RADIS_WEST].[Radis].dbo.Priority
+	[RADIS_WEST].[RadisReporting].dbo.Priority
 
 UPDATE 
 	@Results

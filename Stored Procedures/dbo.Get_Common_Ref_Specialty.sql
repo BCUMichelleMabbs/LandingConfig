@@ -74,17 +74,17 @@ INSERT INTO @Results(LocalCode,LocalName,Source,Area, Pathway)
 		and not (s.main_Ident = '1800' and s.description = 'Minor Casualty Units')
 
 
-INSERT INTO @Results(LocalCode,LocalName,Source,Area, Pathway)
-	SELECT
-		CAST(Lkp_ID AS VARCHAR(10)) AS LocalCode,
-		Lkp_Name AS LocalName,
-		'Symphony' AS Source,
-		'East' AS Areaa,
-		null as Pathway
-	FROM
-		[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Reports].dbo.Lookups
-	WHERE
-		Lkp_ParentID=675
+--INSERT INTO @Results(LocalCode,LocalName,Source,Area, Pathway)
+--	SELECT
+--		CAST(Lkp_ID AS VARCHAR(10)) AS LocalCode,
+--		Lkp_Name AS LocalName,
+--		'Symphony' AS Source,
+--		'East' AS Areaa,
+--		null as Pathway
+--	FROM
+--		[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Reports].dbo.Lookups
+--	WHERE
+--		Lkp_ParentID=675
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 RADIS

@@ -9,7 +9,7 @@ GO
 -- Create date: May 2020
 -- Description:	Extract of all Outpatient Data
 -- 25/08/2021 : Heather Amended Version for Dataset=1311
--- field list 1311 as create table
+-- 09/11/2021 : Diagnosis I10/Camhs/Diet update
 -- =============================================
 CREATE PROCEDURE [dbo].[Get_PAS_Data_Outpatients_West_HWL]
 	
@@ -432,7 +432,9 @@ null as UnsuccessfulAttemptToContactPatient2,
 sch.patnt_refno  as PatientLinkId,    ----------------------------- Hwl reinstated want this inorder to be able to do updates
 CONVERT(time,sch.arrived_Dttm)  AS TimeArrivedAtAppointment,
 null  as SpecialtyOfNextAppointment,
-sch.refrl_refno as refrl_refno
+sch.refrl_refno as refrl_refno,
+null as Diagnosis1, --updated later
+null as Diagnosis2  --updated later
 
 
 from dbo.schedules sch
@@ -519,6 +521,7 @@ and sch.SATYP_REFNO <> 205912
 
 
 
+--Blank GP/GP Practice - default codes
 
 UPDATE #op_table
 SET    GPAtTimeOfActivity = ''HWL1'',

@@ -1,3 +1,5 @@
+
+EXEC sp_addrolemember N'db_datareader', N'CYMRU\Ay076271'
 ALTER ROLE [db_datareader] ADD MEMBER [cymru\an107547]
 GO
 ALTER ROLE [db_datareader] ADD MEMBER [CYMRU\Ch078200]

@@ -546,7 +546,7 @@ CREATE TABLE Foundation.dbo.Cancer_Data_Tracker(
 	ConsultantCode			VARCHAR(10),
 	Consultant				VARCHAR(100),
 	SpecialtyCode			VARCHAR(10),
-	Specialty				VARCHAR(50),
+	Specialty				VARCHAR(200),
 	SpecialtyDerived		VARCHAR(50),
 	ReferralSentDate		DATE,
 	DateOnList				DATE,
@@ -562,7 +562,8 @@ CREATE TABLE Foundation.dbo.Cancer_Data_Tracker(
 	NextStage				VARCHAR(50),
 	Comments				VARCHAR(MAX),
 	RunDate					DATE,
-	AddToTracker			CHAR(1) DEFAULT('Y')
+	AddToTracker			CHAR(1) DEFAULT('Y'),
+	UPI						VARCHAR(50)
 )
 
 DECLARE @Cancer_Data_Tracker AS TABLE(
@@ -584,7 +585,7 @@ DECLARE @Cancer_Data_Tracker AS TABLE(
 	ConsultantCode			VARCHAR(10),
 	Consultant				VARCHAR(100),
 	SpecialtyCode			VARCHAR(10),
-	Specialty				VARCHAR(50),
+	Specialty				VARCHAR(200),
 	ReferralSentDate		DATE,
 	DateOnList				DATE,
 	TCIDate					DATE,
@@ -1516,6 +1517,30 @@ FROM
 	Foundation.dbo.Cancer_Data_Tracker CT
 	LEFT JOIN @Specialty S ON CT.Area=S.Area AND CT.Source=S.Source AND CT.SpecialtyCode=S.SpecialtyCode
 
+
+
+--ADDED 8 NOVEMBER 2021 - SEE EMAIL CONVERSATION TITLED 'UPI'
+UPDATE
+	Foundation.dbo.Cancer_Data_Tracker
+SET
+	UPI=REPLACE(convert(varchar(8),cast(isnull(ReferralSentDate,DateOnList) as date),112) 
++cast(case SuspectedTumourSite
+         when'Head & Neck' then '01'
+         when 'Upper Gastrointestinal' then '02'
+         when 'Lower Gastrointestinal' then '03'
+         when 'Lung' then '04'
+         when 'Sarcoma' then '05'
+		 WHEN 'Skin' then '06'
+         when 'Brain/CNS' then '07'
+         when 'Breast' then '08'
+         when 'Gynaecological' then '09'
+         when 'Urological' then '10'
+         when 'Haematological' then '11'
+         when 'Acute Leukaemia' then '12'
+         when 'Childrens' then '13'
+         when 'Other' then '98'
+         else '98' end
+ as varchar) +cast( LocalPatientIdentifier as varchar),' ','') 
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 DONE

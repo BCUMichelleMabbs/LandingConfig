@@ -6,7 +6,7 @@ GO
 
 
 
-create PROCEDURE [dbo].[Get_Radiology_Ref_PregnancyStatus]
+CREATE PROCEDURE [dbo].[Get_Radiology_Ref_PregnancyStatus]
 	
 AS
 BEGIN
@@ -30,7 +30,7 @@ SELECT
 	'Radis' AS Source,
 	'Central' AS Area
 FROM 
-	[RADIS_CENTRAL].[Radis].dbo.DoseUnit
+	[RADIS_CENTRAL].[RadisReporting].dbo.DoseUnit
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -40,7 +40,7 @@ SELECT
 	'Radis' AS Source,
 	'East' AS Area
 FROM
-	[RADIS_EAST].[Radis].dbo.DoseUnit
+	[RADIS_EAST].[RadisReporting].dbo.DoseUnit
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source,Area)
@@ -50,7 +50,7 @@ SELECT
 	'Radis' AS Source,
 	'West' AS Area
 FROM
-	[RADIS_WEST].[Radis].dbo.DoseUnit
+	[RADIS_WEST].[RadisReporting].dbo.DoseUnit
 
 UPDATE 
 	@Results

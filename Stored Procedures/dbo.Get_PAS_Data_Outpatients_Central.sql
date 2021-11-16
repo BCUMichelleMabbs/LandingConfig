@@ -190,7 +190,7 @@ BEGIN
 			nullif(rtrim(t.Clinic_Code), '''') as ClinicCode,
 
 			nullif(rtrim(t.next_appt_pref_clinic), '''') as NextAppointmentPreferredClinic,
-			nullif(rtrim(t.next_Clin_con), '''') as HCPAtNextAppointment,
+			nullif(rtrim(t.next_Clin_con), '''') as ClinicalConditionAttNextAppointment,
 
 			nullif(rtrim(t.Appt_Type), '''') as AppointmentType,
 			nullif(rtrim(t.Rott_Reason), '''') as ReasonForRemoval,
@@ -263,7 +263,8 @@ BEGIN
 
 	
 		CASE	WHEN T.DATE_NOTIFIED IS NULL THEN NULL 
-				ELSE DATEDIFF(day, T.DATE_NOTIFIED, T.TRT_DATE) END AS DaysNotifedBeforeAppointment,
+				ELSE DATEDIFF(day, T.DATE_NOTIFIED, T.TRT_DATE) 
+				END AS DaysNotifedBeforeAppointment,
 		
 		extract(YEAR from t.PIFU_Date)||''-''||extract(month from t.PIFU_Date)||''-''||extract(DAY from t.PIFU_Date) as DatePatientInitiatedFollowUp,
 		nullif(rtrim(t.Consult_Method), '''') as ConsultationMethod,
@@ -284,7 +285,9 @@ BEGIN
 				ELSE SUBSTRING(T.Arrival_TIME FROM 1 FOR 2)||'':''||SUBSTRING(T.Arrival_TIME FROM 3 FOR 2) 
 			END AS TimeArrivedAtAppointment,
 
-			nullif(rtrim(T.next_appt_Spec), '''') as SpecialtyOfNextAppointment
+			nullif(rtrim(T.next_appt_Spec), '''') as SpecialtyOfNextAppointment,
+			null as Diagnosis1,
+			null as Diagnosis2
 			
 		FROM
 			TREATMNT T
@@ -332,7 +335,7 @@ BEGIN
 			
 			
 	'
-	) AT [WPAS_Central];
+	) AT [WPAS_Central_Newport];
 
 
 END

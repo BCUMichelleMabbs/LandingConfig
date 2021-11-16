@@ -18,15 +18,15 @@ DECLARE @Results AS TABLE(
 	Source			VARCHAR(8)
 )
 
-INSERT INTO @Results(LocalCode,LocalName,Source)
-SELECT
-	Lkp_ID AS LocalCode,
-	Lkp_Name AS LocalName,
-	'Symphony' AS Source
-FROM 
-	[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Live].dbo.Lookups
-WHERE
-	Lkp_ParentID=5674
+--INSERT INTO @Results(LocalCode,LocalName,Source)
+--SELECT
+--	Lkp_ID AS LocalCode,
+--	Lkp_Name AS LocalName,
+--	'Symphony' AS Source
+--FROM 
+--	[RYPA4SRVSQL0014.CYMRU.NHS.UK].[Wrexham_Live].dbo.Lookups
+--WHERE
+--	Lkp_ParentID=5674
 
 
 INSERT INTO @Results(LocalCode,LocalName,Source)
@@ -62,6 +62,21 @@ INSERT INTO @Results(LocalCode,LocalName,Source)	(
 	WHERE
 		RFVDM_CODE='ATDIS'
 	) 
+
+
+	INSERT INTO @Results(LocalCode,LocalName,Source)
+(
+Select Distinct
+		a.DischargeOutcome as LocalCode,
+		NULL as LocalName,
+		a.Source as Source
+From Foundation.dbo.UnscheduledCare_Data_EDAttendance a
+left join mapping.dbo.UnscheduledCare_DischargeOutcome_Map as tc on rtrim(ltrim(upper(tc.LocalCode))) = ltrim(rtrim(upper(a.DischargeOutcome))) and a.source = 'OldWH' 
+where a.DischargeOutcome is not null
+)
+
+
+
 
 
 --UPDATE @Results SET 
@@ -105,5 +120,6 @@ FROM
 	INNER JOIN Mapping.dbo.UnscheduledCare_DischargeOutcome DO ON DOM.MainCode=DO.MainCode
 
 SELECT * FROM @Results
+order by maincode
 END
 GO

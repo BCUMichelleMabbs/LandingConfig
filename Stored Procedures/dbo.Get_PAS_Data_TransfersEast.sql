@@ -3,25 +3,12 @@ GO
 SET ANSI_NULLS ON
 GO
 
-
-
-
-
-
-
-
-
--- ================================================================
--- Author:		Champika Balasuriya
--- Create date: July 2021
--- Description:	Extract of all episode and ward transfers WPAS East
--- ================================================================
 CREATE PROCEDURE [dbo].[Get_PAS_Data_TransfersEast]
-	
+
 AS
---BEGIN TRY
-	BEGIN
-	SET NOCOUNT ON;
+
+BEGIN
+
 
 
 --use this for manual loads but remember there is a replacement plan set on the warehouse.
@@ -162,23 +149,16 @@ UNION
                      CAST(TREAT.TRT_DATE AS DATE) > '''+@DateOfTransferString+''' 
                     -- AND CAST(TREAT.TRT_DATE AS DATE) <= '''+@DateOfTransferString+''' 
                      AND TREAT.TRT_TYPE IN (''AD'',''AC'',''AL'') 
-                     AND TRANS.TRANSFER_WARD is  not null
+--                     AND TRANS.TRANSFER_WARD is  not null
        ) 
               ORDER BY 
                      EventStartDate, SpellNumber'
 ) AT WPAS_East
 
 
-END
-
---END TRY
-
---BEGIN CATCH
-
---SELECT ERROR_MESSAGE() ERROR ,ERROR_NUMBER() eNUMBER
---END CATCH
+	 ;
 
 
 
-
+END 
 GO

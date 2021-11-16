@@ -4,7 +4,7 @@ SET ANSI_NULLS ON
 GO
 
 
-CREATE PROCEDURE [dbo].[Get_PAS_Data_NonContact_West_HWL]
+CREATE PROCEDURE [dbo].[Get_PAS_Data_NonContacts_West]
 	
 AS
 BEGIN
@@ -16,13 +16,14 @@ BEGIN
 -- Amended By : Heather Lewis (HWL) - for Dataset=1311
 --      
 -- 01/09/2021 : HWL NEED TO CONFIRM CONSULT / VIRTUAL TYPE FIELDS
+-- 09/11/2021 : HWL Diagnosis update
 --
---IDS -- (some used in updates) 
+--IDS --   (some used in updates)
 --SystemLinkID	    refrl_refno
---PatientLinkId	    patnt_refno
+--PatientLinkId	    patnt_refno    -- EXCLUDED FROM THE LAST SELECT AT THE END OF SP
 --ActNoteKey	    schdl_refno
 --PathwayUPI        refrl_refno
---WaitingListLinkID wlist_refno
+--WaitingListLinkID wlist_refno    -- EXCLUDED FROM THE LAST SELECT AT THE END OF SP
 --
 -- n.b.
 -- SCTYP=100207 SCHEDULES -These are the appointments which appear when right click on Pasid then 'Contact' 
@@ -109,16 +110,17 @@ CASE WHEN sch.visit_Refno = 213695 THEN ''P'' ELSE  ''6'' END AS [IntendedManage
 prity2.main_code AS [PriorityOfHCP],
 
 
---(SELECT TOP 1 proca.Identifier
---FROM prof_carer_ids proca
---WHERE proca.proca_refno = sch.proca_refno
---and cityp_refno = 200921              -- Telepath Why not National code? HWL 
---and proca.end_dttm IS NULL
---and ISNULL(proca.archv_flag,''N'') = ''N''
---ORDER BY proca.Create_dttm desc
---) as [HCPAtAppointment],
+(SELECT TOP 1 proca.Identifier
+FROM prof_carer_ids proca
+WHERE proca.proca_refno = refrl.REFTO_PROCA_REFNO --changed as per note below Leave this alone - Note on join below stating had to be changed - HWL
+and cityp_refno = 4046             
+and proca.end_dttm IS NULL
+and ISNULL(proca.archv_flag,''N'') = ''N''
+ORDER BY proca.Create_dttm desc
+) as [HCPAtAppointment],
 
-pro.main_ident AS [HCPAtAppointment],   -- Leave this alone - Note on join below stating had to be changed - HWL
+
+--pro.main_ident AS [HCPAtAppointment],   -- Leave this alone - Note on join below stating had to be changed - HWL
 
 ho2.MAIN_IDENT AS [LocationOfAppointment],
 
@@ -127,7 +129,7 @@ ho2.MAIN_IDENT AS [LocationOfAppointment],
 dbo.IS_GetRefValID(''NHS'',sch.scocm_refno) AS [OutcomeOfAppointment],--dbo.IS_GetRefValID(''PIMS'',sch.scocm_refno) AS [LocalOutcome],
 
 referrer.MAIN_IDENT  AS [Referrer],
-heorg.MAIN_IDENT AS [ReferrerOrganisation],
+heorg.MAIN_IDENT AS [ReferringOrganisation],
 CAST('''' AS varchar(50)) AS [GPAtTimeOfActivity],          -- updated field
 CAST('''' AS varchar(50)) AS [GPPracticeAtTimeOfActivity],  -- updated field
 CAST('''' AS varchar(10)) AS [PostcodeAtTimeOfActivity],    -- updated field
@@ -169,8 +171,8 @@ null as [IsNextAppointmentNeeded],
 null as [NextAppointmentDue],
 
 
-(select top 1 pro1.main_ident
-from prof_Carers pro1
+(select top 1 pro1.Identifier
+from prof_carer_ids pro1
 join SCHEDULES sch1
 on sch1.proca_Refno=pro1.proca_Refno
 where sch.patnt_Refno=sch1.patnt_refno
@@ -178,6 +180,7 @@ and sch1.start_dttm>sch.start_dttm
 and sch1.REFRL_REFNO  = sch.REFRL_REFNO 
 and ISNULL(sch1.archv_flag,''N'') = ''N''
 --and sch1.attnd_refno =11540
+and pro1.cityp_refno=4046
 order by sch1.start_dttm asc) 
 as [HCPOfNextAppointment],
 
@@ -227,8 +230,8 @@ order by sch1.start_dttm asc)
 as [NextAppointmentPreferredClinic],   
 
 
-(select top 1 pro1.main_ident
-from prof_Carers pro1
+(select top 1 pro1.identifier
+from prof_Carer_ids pro1
 join SCHEDULES sch1
 on sch1.proca_Refno=pro1.proca_Refno
 where sch.patnt_Refno=sch1.patnt_refno
@@ -236,6 +239,7 @@ and sch1.start_dttm>sch.start_dttm
 and sch1.REFRL_REFNO  = sch.REFRL_REFNO 
 and ISNULL(sch1.archv_flag,''N'') = ''N''
 --and sch1.attnd_refno =11540
+and pro1.cityp_refno=4046
 order by sch1.start_dttm asc) 
 as [HCPAtNextAppointment],
 
@@ -341,12 +345,12 @@ and ISNULL(sch1.archv_flag,''N'') = ''N''
 order by sch1.start_dttm asc) 
  AS [SpecialtyOfNextAppointment],
 
-
-sch.wlist_refno  as [WaitingListLinkID],     
-NULLIF(LEFT(dbo.IS_GetDiagProc(''SCHDL'',sch.schdl_Refno,''DIAGN'',''I10'',''PRIME''),10),'''') AS [Diagnosis1],
-NULLIF(LEFT(dbo.IS_GetDiagProcStr(''SCHDL'',sch.schdl_Refno,''DIAGN'',''I10'',''SECND'',12,4,''C''),4),'''') AS [Diagnosis2],
-CAST('''' as varchar(50)) as [DiagnosisLocal1],      --updated later   
-CAST('''' as varchar(50)) as [DiagnosisLocal2]      --updated later 
+ sch.wlist_refno  as [WaitingListLinkID],  
+ 
+--NULLIF(LEFT(dbo.IS_GetDiagProc(''SCHDL'',sch.schdl_Refno,''DIAGN'',''I10'',''PRIME''),10),'''') AS [Diagnosis1],
+--NULLIF(LEFT(dbo.IS_GetDiagProcStr(''SCHDL'',sch.schdl_Refno,''DIAGN'',''I10'',''SECND'',12,4,''C''),4),'''') AS [Diagnosis2],
+CAST('''' as varchar(50)) as [Diagnosis1],     --updated later   
+CAST('''' as varchar(50)) as [Diagnosis2]      --updated later 
 
 
 
@@ -530,10 +534,33 @@ and NextAppt.schdl_refno = (select min(s2.schdl_refno)
 
 
 
--- Diagnosis - Local
+-- Diagnosis 
 
 UPDATE #op_table
-set DiagnosisLocal1 = d.code
+set Diagnosis1 = d.code
+from #op_table tmp
+join diagnosis_procedures d on d.sorce_refno = tmp.actnotekey and d.patnt_refno = tmp.PatientLinkID
+where d.sorce_code = ''SCHDL''
+and   d.dptyp_code = ''DIAGN''
+and   d.ccsxt_code = ''I10''
+and   d.mplev_refno= ''200723''
+and   isnull(d.archv_flag,''N'')=''N''
+
+UPDATE #op_table 
+set Diagnosis2 = d.code
+from #op_table tmp
+join diagnosis_procedures d on d.sorce_refno = tmp.actnotekey and d.patnt_refno = tmp.PatientLinkID
+where d.sorce_code = ''SCHDL''
+and   d.dptyp_code = ''DIAGN''
+and   d.ccsxt_code = ''I10''
+and   d.mplev_refno= ''200724''
+and   isnull(d.archv_flag,''N'')=''N''
+
+
+
+
+UPDATE #op_table
+set Diagnosis1 = d.code
 from #op_table tmp
 join diagnosis_procedures d on d.sorce_refno = tmp.actnotekey and d.patnt_refno = tmp.PatientLinkID
 where d.sorce_code = ''SCHDL''
@@ -543,7 +570,7 @@ and   d.mplev_refno= ''200723''
 and   isnull(d.archv_flag,''N'')=''N''
 
 UPDATE #op_table 
-set DiagnosisLocal2 = d.code
+set Diagnosis2 = d.code
 from #op_table tmp
 join diagnosis_procedures d on d.sorce_refno = tmp.actnotekey and d.patnt_refno = tmp.PatientLinkID
 where d.sorce_code = ''SCHDL''
@@ -553,7 +580,7 @@ and   d.mplev_refno= ''200724''
 and   isnull(d.archv_flag,''N'')=''N''
 
 UPDATE #op_table
-set DiagnosisLocal1 = d.code
+set Diagnosis1 = d.code
 from #op_table tmp
 join diagnosis_procedures d on d.sorce_refno = tmp.actnotekey and d.patnt_refno = tmp.PatientLinkID
 where d.sorce_code = ''SCHDL'' 
@@ -563,7 +590,7 @@ and   d.mplev_refno= ''200723''
 and   isnull(d.archv_flag,''N'')=''N''
 
 UPDATE #op_table
-set DiagnosisLocal2 = d.code
+set Diagnosis2 = d.code
 from #op_table tmp
 join diagnosis_procedures d on d.sorce_refno = tmp.actnotekey and d.patnt_refno = tmp.PatientLinkID
 where d.sorce_code = ''SCHDL''
@@ -574,12 +601,122 @@ and   isnull(d.archv_flag,''N'')=''N''
 
 
 
+----------------------------------------------------------------------------------------------------------------
 
 
 
 
+select 
 
-SELECT * FROM #op_Table 
+nullif(rtrim(NHSNumber),'''') as NHSNumber,
+nullif(rtrim(LocalPatientIdentifier),'''') as LocalPatientIdentifier,
+nullif(rtrim(DateOfAppointment),'''') as DateOfAppointment,
+nullif(rtrim(TimeOfAppointment),'''') as TimeOfAppointment,
+nullif(rtrim(SystemLinkID),'''') as SystemLinkID,
+nullif(rtrim(TreatmentType),'''') as TreatmentType,
+nullif(rtrim(IntendedManagement),'''') as IntendedManagement,
+nullif(rtrim(PriorityOfHCP),'''') as PriorityOfHCP,
+nullif(rtrim(HCPAtAppointment),'''') as HCPAtAppointment,
+nullif(rtrim(LocationOfAppointment),'''') as LocationOfAppointment,
+nullif(rtrim(TypeOfAppointment),'''') as TypeOfAppointment,
+nullif(rtrim(OutcomeOfAppointment),'''') as OutcomeOfAppointment,
+nullif(rtrim(Referrer),'''') as Referrer,
+nullif(rtrim(ReferringOrganisation),'''') as ReferringOrganisation,
+nullif(rtrim(GPAtTimeOfActivity),'''') as GPAtTimeOfActivity,
+nullif(rtrim(GPPracticeAtTimeOfActivity),'''') as GPPracticeAtTimeOfActivity,
+nullif(rtrim(PostcodeAtTimeOfActivity),'''') as PostcodeAtTimeOfActivity,
+nullif(rtrim(LHBOfResidence),'''') as LHBOfResidence,
+nullif(rtrim(PatientCategory),'''') as PatientCategory,
+nullif(rtrim(CommissionerType),'''') as CommissionerType,
+nullif(rtrim(GPRefNoOnTreatment),'''') as GPRefNoOnTreatment,
+nullif(rtrim(ClinicNumber),'''') as ClinicNumber,
+nullif(rtrim(TimeOfTreatment),'''') as TimeOfTreatment,
+nullif(rtrim(TimeLeftAppointment),'''') as TimeLeftAppointment,
+nullif(rtrim(StaffGrade),'''') as StaffGrade,
+nullif(rtrim(ReasonForDNA),'''') as ReasonForDNA,
+nullif(rtrim(SpecialtyOfAppointment),'''') as SpecialtyOfAppointment,
+nullif(rtrim(TimeHCPReady),'''') as TimeHCPReady,
+nullif(rtrim(Commissioner),'''') as Commissioner,
+nullif(rtrim(PatientClassification),'''') as PatientClassification,
+nullif(rtrim(ClinicSlotKey),'''') as ClinicSlotKey,
+nullif(rtrim(DateOfNextApproxAppointment),'''') as DateOfNextApproxAppointment,
+nullif(rtrim(DateAppointmentCreated),'''') as DateAppointmentCreated,
+nullif(rtrim(DateAppointmentLastModified),'''') as DateAppointmentLastModified,
+nullif(rtrim(IsNextAppointmentNeeded),'''') as IsNextAppointmentNeeded,
+nullif(rtrim(NextAppointmentDue),'''') as NextAppointmentDue,
+nullif(rtrim(HCPOfNextAppointment),'''') as HCPOfNextAppointment,
+nullif(rtrim(AppointmentConfirmed),'''') as AppointmentConfirmed,
+OtherInformation as OtherInformation,
+nullif(rtrim(LocationOfNextAppointment),'''') as LocationOfNextAppointment,
+nullif(rtrim(ActNoteKey),'''') as ActNoteKey,
+nullif(rtrim(OutcomeReason),'''') as OutcomeReason,
+nullif(rtrim(IgnorePartialBooking),'''') as IgnorePartialBooking,
+--nullif(rtrim(AppointmentDirective),'''') as AppointmentDirective, -- this needs to be code and not text
+null as AppointmentDirective,
+nullif(rtrim(FutureAppointmentDirective),'''') as FutureAppointmentDirective,
+nullif(rtrim(DateNotified),'''') as DateNotified,
+nullif(rtrim(ClinicCode),'''') as ClinicCode,
+nullif(rtrim(NextAppointmentPreferredClinic),'''') as NextAppointmentPreferredClinic,
+nullif(rtrim(HCPAtNextAppointment),'''') as ClinicalConditionAtNextAppointment,
+nullif(rtrim(AppointmentType),'''') as AppointmentType,
+nullif(rtrim(ReasonForRemoval),'''') as ReasonForRemoval,
+nullif(rtrim(DateOfNextAppointment),'''') as DateOfNextAppointment,
+nullif(rtrim(NextAppointmentActNoteKey),'''') as NextAppointmentActNoteKey,
+nullif(rtrim(HealthRiskFactor),'''') as HealthRiskFactor,
+nullif(rtrim(NextHealthRiskFactor),'''') as NextHealthRiskFactor,
+nullif(rtrim(PathwayEventDate),'''') as PathwayEventDate,
+nullif(rtrim(PathwayEventType),'''') as PathwayEventType,
+nullif(rtrim(PathwayUPI),'''') as PathwayUPI,
+nullif(rtrim(PathwayEventSource),'''') as PathwayEventSource,
+nullif(rtrim(PathwayKey),'''') as PathwayKey,
+nullif(rtrim(PathwayCreateDate),'''') as PathwayCreateDate,
+nullif(rtrim(PathwayModifyDate),'''') as PathwayModifyDate,
+nullif(rtrim(Area),'''') as Area,
+nullif(rtrim(Source),'''') as Source,
+nullif(rtrim(DateReferred),'''') as DateReferred,
+nullif(rtrim(DateClinicallyReferred),'''') as DateClinicallyReferred,
+nullif(rtrim(DateOnSystem),'''') as DateOnSystem,
+nullif(rtrim(SpecialtyOnReferral),'''') as SpecialtyOnReferral,
+nullif(rtrim(SourceOfReferral),'''') as SourceOfReferral,
+nullif(rtrim(ClinicalCondition),'''') as ClinicalCondition,
+NotesOnReferral as NotesOnReferral,
+nullif(rtrim(GPRefNoOnReferral),'''') as GPRefNoOnReferral,
+nullif(rtrim(ClinicScheduleID),'''') as ClinicScheduleID,
+nullif(rtrim(ClinicSessionType),'''') as ClinicSessionType,
+--ClinicSessionLocation as ClinicSessionLocation,
+null as clinicsessionlocation,
+nullif(rtrim(Procedure1),'''') as Procedure1,
+nullif(rtrim(Procedure2),'''') as Procedure2,
+nullif(rtrim(Procedure3),'''') as Procedure3,
+nullif(rtrim(Procedure4),'''') as Procedure4,
+nullif(rtrim(Procedure5),'''') as Procedure5,
+nullif(rtrim(Procedure6),'''') as Procedure6,
+nullif(rtrim(Procedure7),'''') as Procedure7,
+nullif(rtrim(Procedure8),'''') as Procedure8,
+nullif(rtrim(Procedure9),'''') as Procedure9,
+nullif(rtrim(Procedure10),'''') as Procedure10,
+nullif(rtrim(Procedure11),'''') as Procedure11,
+nullif(rtrim(Procedure12),'''') as Procedure12,
+OtherInformationPrevious as OtherInformationPrevious,
+nullif(rtrim(ActNoteKeyPrevious),'''') as ActNoteKeyPrevious,
+nullif(rtrim(DateOfLastAppointment),'''') as DateOfLastAppointment,
+nullif(rtrim(GPRefNoPrevious),'''') as GPRefNoPrevious,
+nullif(rtrim(DaysNotifiedBeforeAppointment),'''') as DaysNotifiedBeforeAppointment,
+nullif(rtrim(DatePatientInitiatedFollowUp),'''') as DatePatientInitiatedFollowUp,
+nullif(rtrim(ConsultationMethod),'''') as ConsultationMethod,
+nullif(rtrim(VirtualContactType),'''') as VirtualContactType,
+nullif(rtrim(NextConsultationMethod),'''') as NextConsultationMethod,
+nullif(rtrim(NextVirtualContactType),'''') as NextVirtualContactType,
+ContactDetailsForVirtualAppointment as ContactDetailsForVirtualAppointment,
+nullif(rtrim(UnsuccessfulAttemptToContact1),'''') as UnsuccessfulAttemptToContact1,
+nullif(rtrim(UnsuccessfulAttemptToContact2),'''') as UnsuccessfulAttemptToContact2,
+nullif(rtrim(TimeArrivedAtAppointment),'''') as TimeArrivedAtAppointment,
+nullif(rtrim(SpecialtyOfNextAppointment),'''') as SpecialtyOfNextAppointment,
+nullif(rtrim(Diagnosis1),'''') as Diagnosis1,
+nullif(rtrim(Diagnosis2),'''') as Diagnosis2
+
+
+FROM #op_Table 
 
 DROP TABLE #op_Table 
 

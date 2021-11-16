@@ -49,7 +49,7 @@ Site							varchar(10),
 PatientClassification			varchar(5),
 Forename						varchar(50),
 Linkid							varchar(20),
-SnapshotDateTime				Date,
+SnapshotDateTime				DateTime,
 HospitalDischargedTo			varchar(100),
 LocationOfPatient				varchar(100),
 TransferredTo					varchar(100),
@@ -276,13 +276,24 @@ UPDATE @results  SET LocationOfPatient = ca.PatientLocation FROM  @results i lef
 UPDATE @results  SET TransferredTo = ca.TransferRequired FROM   @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 UPDATE @results  SET IsolationRequired = ca.IsolationRequired FROM   @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 UPDATE @results  SET IsolationReasonPrevious = ca.IsolationReason FROM   @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
-UPDATE @results  SET DateIsolationIdentified = ca.DateIdentified FROM   @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
+UPDATE @results  SET DateIsolationIdentified = ca.CurrentIsolationDate FROM   @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 UPDATE @results SET IsolationCurrent = ca.CurrentlyIsolated FROM   @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 UPDATE @results  SET IsolationReasonCurrent = ca.CurrentIsolationReason FROM  @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 UPDATE @results  SET IsolationRiskAssessmentPrevious = ca.RiskAssessed FROM  @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 UPDATE @results  SET IsolationRiskAssessmentCurrent = ca.CurrentRiskAssessment FROM   @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 
 
+/*[07:51] Kerry Roberts (BCUHB - Informatics) 03/11/2021
+I spoke to Mike Greenhaulgh about the differences between stream front end and back end and he said that there is a rule to basically say if the ward on stream doesn't match the ward on wpas then the patient location is cleared, as it means the patient has moved ward but the details haven't been updated.  The example we were looking at was on ITU and apparently they don't have a board so they don't realise its out of date. 
+
+*/
+
+UPDATE @results
+SET LocationOfPatient = 
+	CASE WHEN ca.updateward <> i.ward THEN NULL
+	ELSE ca.PatientLocation
+	end
+	FROM  @results i left join [7A1AUSRVSQL0003].[WardBoards].[dbo].[CurrentAdmissionExtras] ca on (ca.admissionid = i.LinkID and ca.patientid = i.LocalPatientIdentifier and ca.area = i.area)
 
 
 
@@ -332,6 +343,7 @@ select
 
 from @results
 --drop table @PASCurrentInpatient 
+--WHERE LocalPatientIdentifier = 'G014495'
 
 END
 
